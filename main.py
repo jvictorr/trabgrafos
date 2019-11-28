@@ -105,7 +105,7 @@ def mainSP(w):
 def bellmanFord(w,q):
 	d = np.ones((len(w),1))*math.inf
 	pai = len(w)*[None]
-	d[0,q] = 0
+	d[q] = 0
 
 	for i in range(len(w)):
 		for u in range(len(w)):
