@@ -142,6 +142,71 @@ def bellmanFord(w,q):
 	return True;
 
 
+##################################################################################
+############################## Busca em Profundidade #############################
+##################################################################################
+
+#Função necessária para os próximos algortimos
+#Ela foi modificada para retornar se existe caminho entre dois vértices em específico
+
+def buscaProfundidade(w,s,t,pai):
+	# s = fonte
+	# t = sorvedouro
+	# pai = vetor de precedentes
+	visitado = len(w)*[False]
+	fila = []
+
+	#Inicializando a fila com o vértice fonte e o marcando como visitado
+	fila.append(s)
+	visitado[s] = True
+
+	while fila:
+
+		x = fila.pop(0)
+
+		for index,peso in enumerate(w[x]):
+			if visitado[index] == False and peso > 0:
+				fila.append(index)
+				visitado[index] = True
+				pai[index] = x
+	if visitado[t]:
+		return True
+	else:
+	   False
+
+
+
+##################################################################################
+############################## Ford-Fulkerson ####################################
+##################################################################################
+
+
+def fordFulkerson(w,s,t):
+
+	pai = len(w)*[-1]
+	fluxoMax = 0
+
+	while buscaProfundidade(w,s,t,pai):
+
+		fluxoCaminho = float('inf')
+		x = t
+
+		#Enquanto o vértice visitado não for a fonte
+		while (x != s):
+			#Certifica de encontrar a menor capacidade residual do reverso da aresta, ou seja, o maior fluxo da aresta.
+			fluxoCaminho = min(fluxoCaminho, w[pai[x]][x])
+			x = pai[x]
+
+		fluxoMax += fluxoCaminho
+
+		x = t
+		while (x != s):
+			y = pai[x]
+			w[y][x] -= fluxoCaminho
+			w[x][y] += fluxoCaminho
+			x = pai[x]
+
+	return fluxoMax
 
 def push():
 
