@@ -13,7 +13,7 @@ def matrizPesos():
 		q[1] = int(q[1])
 
 	arquivo.close() #Fecha o arquivo
-	
+
 	#Criação da matriz de adjacencia com todos os pesos infinitos inicialmente
 	w = np.ones((v,v))*math.inf
 	for i in range(v):
@@ -30,7 +30,7 @@ def matrizPesos():
 	for i in range(len(t)):
 		w[t[i,0],t[i,1]] = t[i,2]
 
-	return w, q #Retorna 
+	return w, q #Retorna
 
 ################################################################################
 ###################### Algoritmo de Floyd-Warshall #############################
@@ -52,9 +52,9 @@ def floydWarshall(w):
 ################################################################################
 
 def calcSP(w,i,j,m):
-	if i == j: 
+	if i == j:
 		return 0
-	if m == 1: 
+	if m == 1:
 		return w[i,j]
 
 	c = math.inf
@@ -89,7 +89,7 @@ def ShortPath(l, w):
 					c = l[i,k] + w[k,j]
 			l2[i,j] = c
 
-	return l2    
+	return l2
 
 
 def mainSP(w):
@@ -117,13 +117,14 @@ def bellmanFord(w,q):
 	for u in range(len(w)):
 		for v in range(len(w)):
 			if d[v] > d[u]+w[u,v]:
+				print("Possui circuito negativo!")
 				return False
 
 	for i in range(len(w)):
 		if i!=q and pai[i] != None:
 			aux = int(pai[i])
 			p = []
-			p.append(i)	
+			p.append(i)
 
 			while aux != q:
 				p.append(aux)
@@ -152,4 +153,3 @@ if(type(q) == int):
 	bellmanFord(w,q)
 else:
 	print("")
-
