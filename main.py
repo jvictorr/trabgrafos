@@ -117,6 +117,7 @@ def bellmanFord(w,q):
 	for u in range(len(w)):
 		for v in range(len(w)):
 			if d[v] > d[u]+w[u,v]:
+				print("Possui circuito negativo!")
 				return False
 
 	for i in range(len(w)):
