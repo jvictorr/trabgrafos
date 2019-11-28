@@ -208,7 +208,64 @@ def fordFulkerson(w,s,t):
 
 	return fluxoMax
 
-def push():
+
+##################################################################################
+################################ Push-Relabel ####################################
+##################################################################################
+
+
+def push(u,v,f,c,e):
+	d = min(e[u],c[u,v]-f[u,v]);
+	f[u,v] += d
+	f[v,u] -= f[u,v]
+	e[u] -= d
+	e[v] -= d
+
+def relabel(h,u):
+	h[u] = 1 + min(h)
+
+def preflow(w,s):
+	f = np.zeros((len(w),len(w)),dtype=int)
+	c = w.copy()
+
+	h = np.zeros(len(w))
+	e = np.zeros(len(w))
+
+	h[s] = len(w)
+
+	for i in range(len(w)):
+		if s != i and c[s,i] != math.inf:
+			f[s,i] = c[s,i]
+			f[i,s] -= c[s,i]
+			e[i] = c[s,i]
+			e[s] -= c[s,i]
+
+	return f,c,h,e
+
+def pushRelabel(w,s,t):
+	f,c,h,e = preflow(w,s)
+	for j in range(len(w)*len(w)):
+		for u in range(len(w)):
+			if e[u]>0 and u!=s and u!=t:
+				relabel(h,u)
+				for v in range(len(w)):
+					if (c[u,v]-f[u,v]) != 0:
+						if h[u] == h[v] + 1:
+							push(u,v,f,c,e)
+
+	max_fluxo = 0
+	for i in range(len(w)):
+		max_fluxo += f[i,t]
+	m = f.copy()
+	print("\n>>>>>Generic-Push-Relabel<<<<<<\n")
+	print("\nFluxo máximo: {}\n".format(max_fluxo))
+	print(f)
+
+
+
+##################################################################################
+############################## Código principal ####################################
+##################################################################################
 
 
 
@@ -222,4 +279,6 @@ if(type(q) == int):
 	print(mainSP(w))
 	bellmanFord(w,q)
 else:
-	print("")
+	s = q[0]
+	t = q[1]
+	print(fordFulkerson(w,s,t))
