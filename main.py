@@ -122,7 +122,7 @@ def bellmanFord(w,q):
 
 	for i in range(len(w)):
 		if i!=q and pai[i] != None:
-			aux = int(pai[i])
+			aux = pai[i]
 			p = []
 			p.append(i)
 
@@ -140,6 +140,11 @@ def bellmanFord(w,q):
 					print("")
 
 	return True;
+
+
+
+def push():
+
 
 
 w, q = matrizPesos()
