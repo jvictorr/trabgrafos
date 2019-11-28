@@ -30,14 +30,14 @@ def matrizPesos():
 	for i in range(len(t)):
 		w[t[i,0],t[i,1]] = t[i,2]
 
-	return w, q, v #Retorna
+	return w, q #Retorna
 
 ################################################################################
 ###################### Algoritmo de Floyd-Warshall #############################
 ################################################################################
 
 def floydWarshall(w):
-	d = w
+	d = w.copy()
 	n = len(w)
 
 	for k in range(n):
@@ -65,7 +65,7 @@ def calcSP(w,i,j,m):
 
 
 def menorRecSP(w):
-	l = w
+	l = w.copy()
 	for i in range(len(w)):
 		for j in range(len(w)):
 			l[i,j] = calcSP(w,i,j,len(w))
@@ -93,51 +93,62 @@ def ShortPath(l, w):
 
 
 def mainSP(w):
-	l = w
+	l = w.copy()
 	for i in range(len(w)):
 		l = ShortPath(l,w)
 	return l
 
-# The main function that finds shortest distances from src to
-# all other vertices using Bellman-Ford algorithm.  The function
-# also detects negative weight cycle
+################################################################################
+############################## Bellman-Ford ####################################
+################################################################################
+
+def bellmanFord(w,q):
+	d = np.ones((len(w),1))*math.inf
+	pai = len(w)*[None]
+	d[0,q] = 0
+
+	for i in range(len(w)):
+		for u in range(len(w)):
+			for v in range(len(w)):
+				if d[v] > d[u]+w[u,v]:
+					d[v] = d[u]+w[u,v]
+					pai[v] = u
+
+	for u in range(len(w)):
+		for v in range(len(w)):
+			if d[v] > d[u]+w[u,v]:
+				return False
+
+	for i in range(len(w)):
+		if i!=q and pai[i] != None:
+			aux = int(pai[i])
+			p = []
+			p.append(i)
+
+			while aux != q:
+				p.append(aux)
+				aux = pai[aux]
+			p.append(q)
+			p.reverse()
+			aux = p
+			for i in range(len(aux)):
+				print(aux[i],end="")
+				if i != len(aux)-1:
+					print("->",end="")
+				else:
+					print("")
+
+	return True;
 
 
-def BellmanFord(v,w,src):
+w, q = matrizPesos()
 
-	# Step 1: Initialize distances from src to all other vertices
-	# as INFINITE
-	dist = [float("Inf")] * v
-	dist[src] = 0
-
-	# Step 2: Relax all edges |V| - 1 times. A simple shortest
-	# path from src to any other vertex can have at-most |V| - 1
-	# edges
-	for i in range(v - 1):
-		# Update dist value and parent index of the adjacent vertices of
-		# the picked vertex. Consider only those vertices which are still in
-		# queue
-		for i in range(v):
-			for j in range (v):
-				if dist[i] != float("Inf") and dist[i] + w[i,j] < dist[j]:
-					dist[j] = dist[i] + w[i,j]
-
-	# Step 3: check for negative-weight cycles.  The above step
-	# guarantees shortest distances if graph doesn't contain
-	# negative weight cycle.  If we get a shorter path, then there
-	# is a cycle.
-
-	for i in range(v):
-		for j in range (v):
-			if dist[i] != float("Inf") and dist[i] + w[i,j] < dist[j]:
-				print("Graph contains negative weight cycle")
-				return
-	# print all distance
-	print(dist)
-
-w, q, v = matrizPesos()
-BellmanFord(v,w,0)
-print(w)
-print(floydWarshall(w))
-menorRecSP(w)
-#print(mainSP(w))
+if(type(q) == int):
+	print(floydWarshall(w))
+	print("")
+	print(menorRecSP(w))
+	print("")
+	print(mainSP(w))
+	bellmanFord(w,q)
+else:
+	print("")
