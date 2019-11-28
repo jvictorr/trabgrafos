@@ -172,7 +172,7 @@ def buscaProfundidade(w,s,t,pai):
 	if visitado[t]:
 		return True
 	else:
-	   False
+	    return False
 
 
 
