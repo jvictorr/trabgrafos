@@ -37,7 +37,7 @@ def matrizPesos():
 ################################################################################
 
 def floydWarshall(w):
-	d = w
+	d = w.copy()
 	n = len(w)
 
 	for k in range(n):
@@ -65,7 +65,7 @@ def calcSP(w,i,j,m):
 
 
 def menorRecSP(w):
-	l = w
+	l = w.copy()
 	for i in range(len(w)):
 		for j in range(len(w)):
 			l[i,j] = calcSP(w,i,j,len(w))
@@ -93,15 +93,63 @@ def ShortPath(l, w):
 
 
 def mainSP(w):
-	l = w
+	l = w.copy()
 	for i in range(len(w)):
 		l = ShortPath(l,w)
 	return l
 
+################################################################################
+############################## Bellman-Ford ####################################
+################################################################################
+
+def bellmanFord(w,q):
+	d = np.ones((len(w),1))*math.inf
+	pai = len(w)*[None]
+	d[0,q] = 0
+
+	for i in range(len(w)):
+		for u in range(len(w)):
+			for v in range(len(w)):
+				if d[v] > d[u]+w[u,v]:
+					d[v] = d[u]+w[u,v]
+					pai[v] = u
+
+	for u in range(len(w)):
+		for v in range(len(w)):
+			if d[v] > d[u]+w[u,v]:
+				return False
+
+	for i in range(len(w)):
+		if i!=q and pai[i] != None:
+			aux = int(pai[i])
+			p = []
+			p.append(i)	
+
+			while aux != q:
+				p.append(aux)
+				aux = pai[aux]
+			p.append(q)
+			p.reverse()
+			aux = p
+			for i in range(len(aux)):
+				print(aux[i],end="")
+				if i != len(aux)-1:
+					print("->",end="")
+				else:
+					print("")
+
+	return True;
+
 
 w, q = matrizPesos()
-print(w)
-print(floydWarshall(w))
-menorRecSP(w)
-#print(mainSP(w))
+
+if(type(q) == int):
+	print(floydWarshall(w))
+	print("")
+	print(menorRecSP(w))
+	print("")
+	print(mainSP(w))
+	bellmanFord(w,q)
+else:
+	print("")
 
