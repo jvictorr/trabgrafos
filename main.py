@@ -14,10 +14,13 @@ def matrizPesos():
 
 	arquivo.close() #Fecha o arquivo
 
-	#Criação da matriz de adjacencia com todos os pesos infinitos inicialmente
-	w = np.ones((v,v))*math.inf
-	for i in range(v):
-		w[i][i] = 0
+	if(type(q) == int): #Opção de grafo para menores caminhos
+		#Criação da matriz de adjacencia com todos os pesos infinitos inicialmente infinitos
+		w = np.ones((v,v))*math.inf
+		for i in range(v):
+			w[i][i] = 0
+	else: #Opção de grafo para problemas de fluxo
+		w = np.zeros((v,v))
 
 	#Criação da matriz de arestas e pesos, conforme o arquivo
 	t = np.zeros((len(texto)-2,3),int)
@@ -172,7 +175,7 @@ def buscaProfundidade(w,s,t,pai):
 	if visitado[t]:
 		return True
 	else:
-	   False
+	   return False
 
 
 
@@ -190,6 +193,7 @@ def fordFulkerson(w,s,t):
 
 		fluxoCaminho = float('inf')
 		x = t
+
 
 		#Enquanto o vértice visitado não for a fonte
 		while (x != s):
@@ -270,7 +274,7 @@ def pushRelabel(w,s,t):
 
 
 w, q = matrizPesos()
-
+print(w)
 if(type(q) == int):
 	print(floydWarshall(w))
 	print("")
