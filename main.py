@@ -188,6 +188,8 @@ def fordFulkerson(w,s,t):
 
 	pai = len(w)*[-1]
 	fluxoMax = 0
+	grafoOriginal = np.copy(w)
+
 
 	while buscaProfundidade(w,s,t,pai):
 
@@ -209,6 +211,13 @@ def fordFulkerson(w,s,t):
 			w[y][x] -= fluxoCaminho
 			w[x][y] += fluxoCaminho
 			x = pai[x]
+
+	print('Arestas do corte mínimo:')
+	for i, val in enumerate(w):
+		for j, jval in enumerate(w[i]):
+			if w[i][j] == 0 and grafoOriginal[i][j] > 0:
+				print(i, ' - ', j)
+
 
 	return fluxoMax
 
