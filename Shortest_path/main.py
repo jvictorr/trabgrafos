@@ -62,6 +62,49 @@ def mainSP(w):
 		l = ShortPath(l,w)
 	return l
 
+################################################################################
+############################## Bellman-Ford ####################################
+################################################################################
+
+def bellmanFord(w,q):
+	d = np.ones((len(w),1))*math.inf
+	pai = len(w)*[None]
+	d[q] = 0
+
+	for i in range(len(w)):
+		for u in range(len(w)):
+			for v in range(len(w)):
+				if d[v] > d[u]+w[u,v]:
+					d[v] = d[u]+w[u,v]
+					pai[v] = u
+
+	for u in range(len(w)):
+		for v in range(len(w)):
+			if d[v] > d[u]+w[u,v]:
+				print("Possui circuito negativo!")
+				return False
+
+	for i in range(len(w)):
+		if i!=q and pai[i] != None:
+			aux = pai[i]
+			p = []
+			p.append(i)
+
+			while aux != q:
+				p.append(aux)
+				aux = pai[aux]
+			p.append(q)
+			p.reverse()
+			aux = p
+			for i in range(len(aux)):
+				print(aux[i],end="")
+				if i != len(aux)-1:
+					print("->",end="")
+				else:
+					print("")
+
+	return True;
+
 ##################################################################################
 ############################## Código principal ####################################
 ##################################################################################
@@ -73,5 +116,8 @@ print("")
 if(type(q) == int):
 	print("MATRIZ DE MENORES CAMINHOS:")
 	print(mainSP(w))
+	print("")
+	print("MENORES CAMINHOS A PARTIR DO VÉRTICE INICIAL:")
+	bellmanFord(w,q)
 else:
     print("Por favor, insira apenas um número na segunda linha do grafo.")
