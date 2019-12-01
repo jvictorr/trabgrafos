@@ -226,53 +226,71 @@ def fordFulkerson(w,s,t):
 ################################ Push-Relabel ####################################
 ##################################################################################
 
+def preflow(w, s):
 
-def push(u,v,f,c,e):
-	d = min(e[u],c[u,v]-f[u,v]);
-	f[u,v] += d
-	f[v,u] -= f[u,v]
-	e[u] -= d
-	e[v] -= d
+    n = len(w)
+    c = w.copy()
+    f = [[0]*len(w) for i in range(n)]
 
-def relabel(h,u):
-	h[u] = 1 + min(h)
+    h = [0]*n
+    e = [0]*n
+    h[s] = n
 
-def preflow(w,s):
-	f = np.zeros((len(w),len(w)),dtype=int)
-	c = w.copy()
+    # push some substance to graph
+    for i, p in enumerate(w[s]):
+        f[s][i] += p
+        f[i][s] -= p
+        e[i] += p
 
-	h = np.zeros(len(w))
-	e = np.zeros(len(w))
-
-	h[s] = len(w)
-
-	for i in range(len(w)):
-		if s != i and c[s,i] != math.inf:
-			f[s,i] = c[s,i]
-			f[i,s] -= c[s,i]
-			e[i] = c[s,i]
-			e[s] -= c[s,i]
-
-	return f,c,h,e
+    return f,c,h,e,n
 
 def pushRelabel(w,s,t):
-	f,c,h,e = preflow(w,s)
-	for j in range(len(w)*len(w)):
-		for u in range(len(w)):
-			if e[u]>0 and u!=s and u!=t:
-				relabel(h,u)
-				for v in range(len(w)):
-					if (c[u,v]-f[u,v]) != 0:
-						if h[u] == h[v] + 1:
-							push(u,v,f,c,e)
 
-	max_fluxo = 0
-	for i in range(len(w)):
-		max_fluxo += f[i,t]
-	m = f.copy()
-	print("\n>>>>>Generic-Push-Relabel<<<<<<\n")
-	print("\nFluxo máximo: {}\n".format(max_fluxo))
-	print(f)
+    f,c,h,e,n = preflow(w,s)
+    # Relabel-to-front selection rule
+    verticesList = [i for i in range(n) if i != s and i != t]
+
+    # move through list
+    i = 0
+    while i < len(verticesList):
+        vertexIndex = verticesList[i]
+        previousHeight = h[vertexIndex]
+        while e[vertexIndex] > 0:
+            for neighbourIndex in range(n):
+                # if it's neighbour and current vertex is higher
+                if c[vertexIndex][neighbourIndex] - f[vertexIndex][neighbourIndex] > 0 and h[vertexIndex] > h[neighbourIndex]:
+                    push(c,f,e,vertexIndex,neighbourIndex)
+            relabel(c,f,h,n,vertexIndex)
+
+            
+        if h[vertexIndex] > previousHeight:
+            # if it was relabeled, swap elements
+            # and start from 0 index
+            verticesList.insert(0, verticesList.pop(i))
+            i = 0
+        else:
+            i += 1
+
+    fluxoMax = sum(f[s])
+    return fluxoMax
+    
+
+def push(c, f, e, fromIndex, toIndex):
+    preflowDelta = min(e[fromIndex], c[fromIndex][toIndex] - f[fromIndex][toIndex])
+    f[fromIndex][toIndex] += preflowDelta
+    f[toIndex][fromIndex] -= preflowDelta
+    e[fromIndex] -= preflowDelta
+    e[toIndex] += preflowDelta
+
+def relabel(c,f,h,n,vertexIndex):
+    minHeight = None
+    for toIndex in range(n):
+        if c[vertexIndex][toIndex] - f[vertexIndex][toIndex] > 0:
+            if minHeight is None or h[toIndex] < minHeight:
+                minHeight = h[toIndex]
+
+    if minHeight is not None:
+        h[vertexIndex] = minHeight + 1
 
 
 
@@ -294,4 +312,4 @@ if(type(q) == int):
 else:
 	s = q[0]
 	t = q[1]
-	print(fordFulkerson(w,s,t))
+	print(pushRelabel(w,s,t))
