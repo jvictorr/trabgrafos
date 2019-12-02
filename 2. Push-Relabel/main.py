@@ -39,6 +39,8 @@ def matrizPesos():
 ################################ Push-Relabel ####################################
 ##################################################################################
 
+#Função de inicialização das matrizes de fluxo e capacidade,
+#e dos vetores de altura e excesso dos vértices
 def preflow(w, s):
 
     n = len(w)
@@ -49,7 +51,7 @@ def preflow(w, s):
     e = [0]*n
     h[s] = n
 
-    # push some substance to graph
+    #Inialização da matriz de fluxo e do excesso
     for i, p in enumerate(w[s]):
         f[s][i] += p
         f[i][s] -= p
@@ -57,53 +59,52 @@ def preflow(w, s):
 
     return f,c,h,e,n
 
+#Função que move o fluxo de um vertice a outro
+def push(c, f, e, index, toIndex):
+    d = min(e[index], c[index][toIndex] - f[index][toIndex])
+    f[index][toIndex] += d
+    f[toIndex][index] -= d
+    e[index] -= d
+    e[toIndex] += d
+
+#Função que ajusta a altura dos vértices 
+def relabel(c,f,h,n,index):
+    minHeight = None
+    for toIndex in range(n):
+        if c[index][toIndex] - f[index][toIndex] > 0:
+            if minHeight is None or h[toIndex] < minHeight:
+                minHeight = h[toIndex]
+
+    if minHeight is not None:
+        h[index] = minHeight + 1
+
+#Função principal que encontra o fluxo máximo através das
+#operações push e relabel.
 def pushRelabel(w,s,t):
 
     f,c,h,e,n = preflow(w,s)
-    # Relabel-to-front selection rule
-    verticesList = [i for i in range(n) if i != s and i != t]
+    listN = [i for i in range(n) if i != s and i != t]
 
-    # move through list
     i = 0
-    while i < len(verticesList):
-        vertexIndex = verticesList[i]
-        previousHeight = h[vertexIndex]
-        while e[vertexIndex] > 0:
-            for neighbourIndex in range(n):
-                # if it's neighbour and current vertex is higher
-                if c[vertexIndex][neighbourIndex] - f[vertexIndex][neighbourIndex] > 0 and h[vertexIndex] > h[neighbourIndex]:
-                    push(c,f,e,vertexIndex,neighbourIndex)
-            relabel(c,f,h,n,vertexIndex)
+
+    while i < len(listN):
+        index = listN[i]
+        h_anterior = h[index]
+        while e[index] > 0:
+            for indexAdj in range(n):
+                if c[index][indexAdj] - f[index][indexAdj] > 0 and h[index] > h[indexAdj]:
+                    push(c,f,e,index,indexAdj)
+            relabel(c,f,h,n,index)
 
 
-        if h[vertexIndex] > previousHeight:
-            # if it was relabeled, swap elements
-            # and start from 0 index
-            verticesList.insert(0, verticesList.pop(i))
+        if h[index] > h_anterior:
+            listN.insert(0, listN.pop(i))
             i = 0
         else:
             i += 1
 
     fluxoMax = sum(f[s])
     return fluxoMax
-
-
-def push(c, f, e, fromIndex, toIndex):
-    preflowDelta = min(e[fromIndex], c[fromIndex][toIndex] - f[fromIndex][toIndex])
-    f[fromIndex][toIndex] += preflowDelta
-    f[toIndex][fromIndex] -= preflowDelta
-    e[fromIndex] -= preflowDelta
-    e[toIndex] += preflowDelta
-
-def relabel(c,f,h,n,vertexIndex):
-    minHeight = None
-    for toIndex in range(n):
-        if c[vertexIndex][toIndex] - f[vertexIndex][toIndex] > 0:
-            if minHeight is None or h[toIndex] < minHeight:
-                minHeight = h[toIndex]
-
-    if minHeight is not None:
-        h[vertexIndex] = minHeight + 1
 
 ##################################################################################
 ############################## Código principal ####################################
